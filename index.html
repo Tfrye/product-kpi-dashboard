@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Department KPIs</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+import React, { useState, useEffect } from 'react';
+
+export default function ProductKPIDashboard() {
+  // Load saved data from localStorage or use defaults
+  const [kpiData, setKpiData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('productKPIData');
+      if (saved) {
+        const parsedData = JSON.parse(saved);
+        // Ensure initiatives exist, add default if missing
+        if (!parsedData.initiatives) {
+          parsedData.initiatives = [
+            { id: 1, name: 'Health Cloud transformation (unify all products)', status: 'green', commentary: '' },
+            { id: 2, name: 'Marketing Cloud re-platform + HC integration', status: 'yellow', commentary: '' },
+            { id: 3, name: 'IVR optimization (experience, conversion, quality)', status: 'green', commentary: '' },
+            { id: 4, name: 'TPA & claims processing re-platform + automation', status: 'green', commentary: '' },
+            { id: 5, name: 'Enterprise data architecture, quality, & interoperability', status: 'yellow', commentary: '' },
+            { id: 6, name: 'Unified Member data store + governance (Member 360)', status: 'green', commentary: '' },
+            { id: 7, name: 'Journey Conversion (FTUX, app, nudges, SMS)', status: 'green', commentary: '' },
+            { id: 8, name: 'Health Here: program expansion + conversion', status: 'yellow', commentary: '' },
+            { id: 9, name: 'Outbound scalability (unified & prioritized data, workflow, reporting)', status: 'green', commentary: '' },
+            { id: 10, name: 'AI as a foundation (governance, platform, experiments, org adoption)', status: 'green', commentary: '' }
+          ];
+        }
+        return parsedData;
+      }
+    } catch (error) {
+      console.log('Could not load saved data');
+    }
+    return {
+      month: 'December',
+      year: '2025',
+      roadmapCurrent: 85,
+      roadmapTarget: 80,
+      roadmapChange: 16,
+      roadmapColor: 'yellow',
+      changeRequestsCurrent: 10,
+      changeRequestsTarget: 4,
+      changeRequestsChange: 0,
+      changeRequestsColor: 'green',
+      backlogCurrent: 197,
+      backlogTarget: 125,
+      backlogChange: 9,
+      backlogColor: 'green',
+      metric4Current: 0,
+      metric4Target: 0,
+      metric4Change: 0,
+      metric4Name: 'TBD',
+      initiatives: [
+        { id: 1, name: 'Health Cloud transformation (unify all products)', status: 'green', commentary: '' },
+        { id: 2, name: 'Marketing Cloud re-platform + HC integration', status: 'yellow', commentary: '' },
+        { id: 3, name: 'IVR optimization (experience, conversion, quality)', status: 'green', commentary: '' },
+        { id: 4, name: 'TPA & claims processing re-platform + automation', status: 'green', commentary: '' },
+        { id: 5, name: 'Enterprise data architecture, quality, & interoperability', status: 'yellow', commentary: '' },
+        { id: 6, name: 'Unified Member data store + governance (Member 360)', status: 'green', commentary: '' },
+        { id: 7, name: 'Journey Conversion (FTUX, app, nudges, SMS)', status: 'green', commentary: '' },
+        { id: 8, name: 'Health Here: program expansion + conversion', status: 'yellow', commentary: '' },
+        { id: 9, name: 'Outbound scalability (unified & prioritized data, workflow, reporting)', status: 'green', commentary: '' },
+        { id: 10, name: 'AI as a foundation (governance, platform, experiments, org adoption)', status: 'green', commentary: '' }
+      ]
+    };
+  });
+
+  const [previousData, setPreviousData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('productKPIPreviousData');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.log('No previous data found');
+    }
+    return null;
+  });
+
+  const [showInputs, setShowInputs] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [skipChangeCalc, setSkipChangeCalc] = useState(false);
+  const [expandedInitiative, setExpandedInitiative] = useState(null);
+  const [editingInitiative, setEditingInitiative] = useState(null);
+
+  // Save current data whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('productKPIData', JSON.stringify(kpiData));
+    } catch (error) {
+      console.error('Failed to save data:', error);
+    }
+  }, [kpiData]);
+
+  const getStatusColor = (current, target, lowerIsBetter = false) => {
+    if (lowerIsBetter) {
+      if (current <= target) return 'green';
+      if (current <= target * 1.5) return 'yellow';
+      return 'red';
+    } else {
+      if (current >= target) return 'green';
+      if (current >= target * 0.8) return 'yellow';
+      return 'red';
+    }
+  };
+
+  const getProgressPercent = (current, target) => {
+    if (current === 'N/A' || target === 'N/A') return 0;
+    return Math.min((current / target) * 100, 100);
+  };
+
+  const roadmapStatus = kpiData.roadmapCurrent === 'N/A' ? 'gray' : (kpiData.roadmapColor || 'yellow');
+  const changeRequestsStatus = kpiData.changeRequestsCurrent === 'N/A' ? 'gray' : (kpiData.changeRequestsColor || getStatusColor(kpiData.changeRequestsCurrent, kpiData.changeRequestsTarget, true));
+  const backlogStatus = kpiData.backlogCurrent === 'N/A' ? 'gray' : (kpiData.backlogColor || getStatusColor(kpiData.backlogCurrent, kpiData.backlogTarget));
+  const metric4Status = kpiData.metric4Name === 'TBD' || kpiData.metric4Current === 'N/A' ? 'gray' : getStatusColor(kpiData.metric4Current, kpiData.metric4Target);
+
+  const handleInputChange = (field, value) => {
+    setKpiData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const startNewMonth = () => {
+    setShowConfirmModal(true);
+  };
+
+  const confirmStartNewMonth = () => {
+    try {
+      if (!skipChangeCalc) {
+        // Save current data as previous only if we want to track changes
+        localStorage.setItem('productKPIPreviousData', JSON.stringify(kpiData));
+        setPreviousData(kpiData);
+      } else {
+        // Clear previous data so no changes are calculated
+        localStorage.removeItem('productKPIPreviousData');
+        setPreviousData(null);
+        // Reset all change values to 0
+        setKpiData(prev => ({
+          ...prev,
+          roadmapChange: 0,
+          changeRequestsChange: 0,
+          backlogChange: 0,
+          metric4Change: 0
+        }));
+      }
+      
+      setShowConfirmModal(false);
+      setShowInputs(true);
+      setSkipChangeCalc(false); // Reset for next time
+    } catch (error) {
+      console.error('Save error:', error);
+    }
+  };
+
+  const cancelStartNewMonth = () => {
+    setShowConfirmModal(false);
+  };
+
+  const updateInitiativeStatus = (id, newStatus) => {
+    setKpiData(prev => ({
+      ...prev,
+      initiatives: prev.initiatives.map(init => 
+        init.id === id ? { ...init, status: newStatus } : init
+      )
+    }));
+  };
+
+  const updateInitiativeCommentary = (id, commentary) => {
+    setKpiData(prev => ({
+      ...prev,
+      initiatives: prev.initiatives.map(init => 
+        init.id === id ? { ...init, commentary } : init
+      )
+    }));
+  };
+
+  const updateInitiativeName = (id, name) => {
+    setKpiData(prev => ({
+      ...prev,
+      initiatives: prev.initiatives.map(init => 
+        init.id === id ? { ...init, name } : init
+      )
+    }));
+  };
+
+  const toggleExpand = (id) => {
+    setExpandedInitiative(expandedInitiative === id ? null : id);
+    setEditingInitiative(null);
+  };
+
+  // Auto-calculate changes based on previous month
+  useEffect(() => {
+    if (previousData) {
+      setKpiData(prev => ({
+        ...prev,
+        roadmapChange: Math.round(prev.roadmapCurrent - previousData.roadmapCurrent),
+        changeRequestsChange: Math.round(prev.changeRequestsCurrent - previousData.changeRequestsCurrent),
+        backlogChange: Math.round(prev.backlogCurrent - previousData.backlogCurrent),
+        metric4Change: previousData.metric4Current ? Math.round(prev.metric4Current - previousData.metric4Current) : 0
+      }));
+    }
+  }, [
+    kpiData.roadmapCurrent, 
+    kpiData.changeRequestsCurrent, 
+    kpiData.backlogCurrent,
+    kpiData.metric4Current,
+    previousData
+  ]);
+
+  const exportToPNG = () => {
+    // Simple instruction for user
+    alert('To save as image:\n1. Take a screenshot of the dashboard\n2. Or use browser print > Save as PDF');
+  };
+
+  return (
+    <div style={{
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      minHeight: '100vh',
+      padding: '40px 20px'
+    }}>
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '32px',
+            maxWidth: '500px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}>
+            <h3 style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a',
+              marginBottom: '16px'
+            }}>
+              Save Current Period as Baseline?
+            </h3>
+            <p style={{
+              fontSize: '15px',
+              color: '#666',
+              lineHeight: '1.6',
+              marginBottom: '20px'
+            }}>
+              This will save current data and calculate changes automatically when you enter new values.
+            </p>
+            
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '24px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              color: '#4b5563'
+            }}>
+              <input
+                type="checkbox"
+                checked={skipChangeCalc}
+                onChange={(e) => setSkipChangeCalc(e.target.checked)}
+                style={{ cursor: 'pointer' }}
+              />
+              Skip change calculation (use for first entry or when switching periods)
+            </label>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={cancelStartNewMonth}
+                style={{
+                  padding: '10px 20px',
+                  background: '#f3f4f6',
+                  color: '#4b5563',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmStartNewMonth}
+                style={{
+                  padding: '10px 20px',
+                  background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        
+        {/* Edit Button */}
+        <div style={{ textAlign: 'right', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            {previousData && (
+              <div style={{
+                display: 'inline-block',
+                padding: '8px 16px',
+                background: '#f3f4f6',
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                📊 Previous: {previousData.month} {previousData.year}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              onClick={startNewMonth}
+              style={{
+                padding: '12px 24px',
+                background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              📊 Update Period
+            </button>
+            <button
+              onClick={() => setShowInputs(!showInputs)}
+              style={{
+                padding: '12px 24px',
+                background: showInputs ? '#6b7280' : 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              {showInputs ? '✓ Done Editing' : '✏️ Edit KPI Data'}
+            </button>
+          </div>
+        </div>
+
+        {/* Input Panel */}
+        {showInputs && (
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '30px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+          }}>
+            <h2 style={{ marginBottom: '24px', color: '#1a1a1a', fontSize: '24px' }}>Update Monthly Data</h2>
+            
+            {previousData && (
+              <div style={{
+                padding: '16px',
+                background: '#f0fdf4',
+                borderRadius: '8px',
+                marginBottom: '24px',
+                border: '1px solid #bbf7d0'
+              }}>
+                <div style={{ fontSize: '14px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>
+                  ✓ Previous Month Saved - Changes Auto-Calculated
+                </div>
+                <div style={{ fontSize: '13px', color: '#15803d' }}>
+                  Comparing to {previousData.month} {previousData.year}: 
+                  Roadmap {previousData.roadmapCurrent}% → Change Requests {previousData.changeRequestsCurrent} → Backlog {previousData.backlogCurrent}%
+                </div>
+              </div>
+            )}
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+              {/* Period Label */}
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#667eea', fontSize: '15px', fontWeight: '700' }}>
+                  Reporting Period (e.g., "January 2026" or "Jan 1-15, 2026")
+                </label>
+                <input
+                  type="text"
+                  value={`${kpiData.month} ${kpiData.year}`}
+                  onChange={(e) => {
+                    const parts = e.target.value.split(' ');
+                    handleInputChange('month', parts.slice(0, -1).join(' ') || e.target.value);
+                    handleInputChange('year', parts[parts.length - 1] || kpiData.year);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #667eea',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
+                  placeholder="e.g., January 2026 or Jan 1-15, 2026"
+                />
+              </div>
+              
+              {/* Month and Year - Hidden but kept for backward compatibility */}
+              <input type="hidden" value={kpiData.month} />
+              <input type="hidden" value={kpiData.year} />
+
+              {/* Roadmap Health */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Roadmap Current (%)
+                  <input
+                    type="checkbox"
+                    checked={kpiData.roadmapCurrent === 'N/A'}
+                    onChange={(e) => handleInputChange('roadmapCurrent', e.target.checked ? 'N/A' : 0)}
+                    style={{ marginLeft: 'auto' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#9ca3af' }}>N/A</span>
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.roadmapCurrent === 'N/A' ? '' : kpiData.roadmapCurrent}
+                  onChange={(e) => handleInputChange('roadmapCurrent', parseFloat(e.target.value) || 0)}
+                  disabled={kpiData.roadmapCurrent === 'N/A'}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    background: kpiData.roadmapCurrent === 'N/A' ? '#f3f4f6' : 'white'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Roadmap Target (%)
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.roadmapTarget}
+                  onChange={(e) => handleInputChange('roadmapTarget', parseFloat(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px'
+                  }}
+                />
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Roadmap Health Status Color
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['green', 'yellow', 'red'].map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleInputChange('roadmapColor', color)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',
+                        border: (kpiData.roadmapColor || 'yellow') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Change Requests */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Change Requests Current
+                  <input
+                    type="checkbox"
+                    checked={kpiData.changeRequestsCurrent === 'N/A'}
+                    onChange={(e) => handleInputChange('changeRequestsCurrent', e.target.checked ? 'N/A' : 0)}
+                    style={{ marginLeft: 'auto' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#9ca3af' }}>N/A</span>
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.changeRequestsCurrent === 'N/A' ? '' : kpiData.changeRequestsCurrent}
+                  onChange={(e) => handleInputChange('changeRequestsCurrent', parseFloat(e.target.value) || 0)}
+                  disabled={kpiData.changeRequestsCurrent === 'N/A'}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    background: kpiData.changeRequestsCurrent === 'N/A' ? '#f3f4f6' : 'white'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Change Requests Target
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.changeRequestsTarget}
+                  onChange={(e) => handleInputChange('changeRequestsTarget', parseFloat(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px'
+                  }}
+                />
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Change Requests Status Color
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['green', 'yellow', 'red'].map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleInputChange('changeRequestsColor', color)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',
+                        border: (kpiData.changeRequestsColor || 'green') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Backlog Health */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Backlog Current (%)
+                  <input
+                    type="checkbox"
+                    checked={kpiData.backlogCurrent === 'N/A'}
+                    onChange={(e) => handleInputChange('backlogCurrent', e.target.checked ? 'N/A' : 0)}
+                    style={{ marginLeft: 'auto' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#9ca3af' }}>N/A</span>
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.backlogCurrent === 'N/A' ? '' : kpiData.backlogCurrent}
+                  onChange={(e) => handleInputChange('backlogCurrent', parseFloat(e.target.value) || 0)}
+                  disabled={kpiData.backlogCurrent === 'N/A'}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    background: kpiData.backlogCurrent === 'N/A' ? '#f3f4f6' : 'white'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Backlog Target (%)
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.backlogTarget}
+                  onChange={(e) => handleInputChange('backlogTarget', parseFloat(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px'
+                  }}
+                />
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  Backlog Health Status Color
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['green', 'yellow', 'red'].map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleInputChange('backlogColor', color)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',
+                        border: (kpiData.backlogColor || 'green') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* 4th Metric */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  4th Metric Name
+                </label>
+                <input
+                  type="text"
+                  value={kpiData.metric4Name}
+                  onChange={(e) => handleInputChange('metric4Name', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px'
+                  }}
+                  placeholder="Future metric name"
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  4th Metric Current
+                  <input
+                    type="checkbox"
+                    checked={kpiData.metric4Current === 'N/A'}
+                    onChange={(e) => handleInputChange('metric4Current', e.target.checked ? 'N/A' : 0)}
+                    style={{ marginLeft: 'auto' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#9ca3af' }}>N/A</span>
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.metric4Current === 'N/A' ? '' : kpiData.metric4Current}
+                  onChange={(e) => handleInputChange('metric4Current', parseFloat(e.target.value) || 0)}
+                  disabled={kpiData.metric4Current === 'N/A'}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    background: kpiData.metric4Current === 'N/A' ? '#f3f4f6' : 'white'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}>
+                  4th Metric Target
+                </label>
+                <input
+                  type="number"
+                  value={kpiData.metric4Target}
+                  onChange={(e) => handleInputChange('metric4Target', parseFloat(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '15px'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dashboard Header */}
+        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <div style={{
+            fontSize: '16px',
+            color: '#666',
+            fontWeight: '500',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            {kpiData.month} {kpiData.year}
+          </div>
+          <h1 style={{
+            fontSize: '42px',
+            color: '#1a1a1a',
+            fontWeight: '700',
+            letterSpacing: '-0.5px',
+            marginTop: '10px'
+          }}>
+            Product Department KPIs
+          </h1>
+        </div>
+
+        {/* KPI Cards Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '24px',
+          marginTop: '40px'
+        }}>
+          
+          {/* Roadmap Health Card */}
+          <KPICard
+            title="Roadmap Health"
+            subtitle="Quarterly metric: Cumulative within the quarter; resets each quarter"
+            current={kpiData.roadmapCurrent === 'N/A' ? 'N/A' : `${kpiData.roadmapCurrent}%`}
+            target={`${kpiData.roadmapTarget}%`}
+            targetLabel="TARGET"
+            change={kpiData.roadmapChange}
+            status={roadmapStatus}
+            progress={getProgressPercent(kpiData.roadmapCurrent, kpiData.roadmapTarget)}
+          />
+
+          {/* Change Requests Card */}
+          <KPICard
+            title="Approved Change Requests"
+            subtitle="Minor & Major impact classifications (3 Minors = 1 Major)"
+            current={kpiData.changeRequestsCurrent === 'N/A' ? 'N/A' : kpiData.changeRequestsCurrent}
+            target={kpiData.changeRequestsTarget}
+            targetLabel="Target Impact Score"
+            change={kpiData.changeRequestsChange}
+            status={changeRequestsStatus}
+            progress={100}
+          />
+
+          {/* Backlog Health Card */}
+          <KPICard
+            title="Backlog Health"
+            subtitle="Sprints of refined work queued. Target: 1.25 sprints ahead"
+            current={kpiData.backlogCurrent === 'N/A' ? 'N/A' : `${kpiData.backlogCurrent}%`}
+            target={`${kpiData.backlogTarget}%`}
+            targetLabel="Target"
+            change={kpiData.backlogChange}
+            status={backlogStatus}
+            progress={100}
+          />
+        </div>
+
+        {/* Top 10 Initiatives Section */}
+        <div style={{
+          marginTop: '40px',
+          background: 'white',
+          borderRadius: '16px',
+          padding: '28px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
+        }}>
+          <div style={{
+            borderBottom: '2px solid #e5e7eb',
+            paddingBottom: '14px',
+            marginBottom: '20px'
+          }}>
+            <h2 style={{
+              fontSize: '22px',
+              fontWeight: '700',
+              color: '#1a1a1a',
+              margin: 0
+            }}>
+              Top 10 Product Initiatives
+            </h2>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(2, 1fr)', 
+            gap: '10px' 
+          }}>
+            {(kpiData.initiatives || []).map((initiative) => (
+              <div key={initiative.id} style={{
+                gridColumn: expandedInitiative === initiative.id ? '1 / -1' : 'auto',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                {/* Compact Row */}
+                <div
+                  onClick={() => toggleExpand(initiative.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    padding: '12px',
+                    background: expandedInitiative === initiative.id ? '#f9fafb' : 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '60px',
+                    flex: 1
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#f9fafb'}
+                  onMouseOut={(e) => {
+                    if (expandedInitiative !== initiative.id) {
+                      e.currentTarget.style.background = 'white';
+                    }
+                  }}
+                >
+                  <div style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    background: initiative.status === 'green' ? '#22c55e' : initiative.status === 'yellow' ? '#f59e0b' : '#ef4444',
+                    marginRight: '12px',
+                    flexShrink: 0,
+                    marginTop: '2px'
+                  }} />
+                  
+                  <div style={{
+                    flex: 1,
+                    fontSize: '13px',
+                    color: '#1a1a1a',
+                    fontWeight: '500',
+                    lineHeight: '1.4',
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word'
+                  }}>
+                    <div>{initiative.name}</div>
+                    {initiative.commentary && expandedInitiative !== initiative.id && (
+                      <div style={{
+                        fontSize: '11px',
+                        color: '#6b7280',
+                        marginTop: '4px',
+                        fontWeight: '400',
+                        lineHeight: '1.3',
+                        fontStyle: 'italic'
+                      }}>
+                        {initiative.commentary.length > 60 
+                          ? `${initiative.commentary.substring(0, 60)}...` 
+                          : initiative.commentary}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expanded Detail */}
+                {expandedInitiative === initiative.id && (
+                  <div style={{
+                    padding: '20px',
+                    background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderTop: 'none',
+                    borderRadius: '0 0 8px 8px',
+                    marginTop: '-8px'
+                  }}>
+                    {/* Initiative Name Editor */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#6b7280',
+                        marginBottom: '8px'
+                      }}>
+                        Initiative Name
+                      </label>
+                      <input
+                        type="text"
+                        value={initiative.name}
+                        onChange={(e) => updateInitiativeName(initiative.id, e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#6b7280',
+                          marginBottom: '8px'
+                        }}>
+                          Status
+                        </label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {['green', 'yellow', 'red'].map(color => (
+                            <button
+                              key={color}
+                              onClick={() => updateInitiativeStatus(initiative.id, color)}
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',
+                                border: initiative.status === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#6b7280',
+                        marginBottom: '8px'
+                      }}>
+                        Commentary / Notes
+                      </label>
+                      <textarea
+                        value={initiative.commentary}
+                        onChange={(e) => updateInitiativeCommentary(initiative.id, e.target.value)}
+                        placeholder="Add context, updates, blockers, or notes..."
+                        style={{
+                          width: '100%',
+                          minHeight: '80px',
+                          padding: '12px',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontFamily: 'inherit',
+                          resize: 'vertical'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KPICard({ title, subtitle, current, target, targetLabel = "Target", change, status, progress, isPlaceholder = false }) {
+  // Check if current value is N/A or empty
+  const isNA = current === 'N/A' || current === '--';
+  
+  const statusColors = {
+    green: { bg: '#22c55e', shadow: 'rgba(34, 197, 94, 0.2)', progressBg: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', changeBg: '#f0fdf4', changeColor: '#22c55e' },
+    red: { bg: '#ef4444', shadow: 'rgba(239, 68, 68, 0.2)', progressBg: 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)', changeBg: '#fef2f2', changeColor: '#ef4444' },
+    yellow: { bg: '#f59e0b', shadow: 'rgba(245, 158, 11, 0.2)', progressBg: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)', changeBg: '#fffbeb', changeColor: '#f59e0b' },
+    gray: { bg: '#9ca3af', shadow: 'rgba(156, 163, 175, 0.2)', progressBg: 'linear-gradient(90deg, #d1d5db 0%, #9ca3af 100%)', changeBg: '#f3f4f6', changeColor: '#6b7280' }
+  };
+
+  // Use gray for placeholder or N/A values, otherwise use the status color
+  const colors = (isPlaceholder || isNA) ? statusColors.gray : statusColors[status];
+  
+  return (
+    <div style={{
+      background: (isPlaceholder || isNA) ? '#f9fafb' : 'white',
+      borderRadius: '12px',
+      padding: '20px',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+      position: 'relative',
+      overflow: 'hidden',
+      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+      opacity: (isPlaceholder || isNA) ? 0.7 : 1,
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '3px',
+        background: (isPlaceholder || isNA) ? '#e5e7eb' : 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+      }} />
+
+      {/* Header with title and status */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '8px'
+      }}>
+        <div style={{ flex: 1, paddingRight: '8px' }}>
+          <div style={{
+            fontSize: '13px',
+            color: (isPlaceholder || isNA) ? '#9ca3af' : '#1a1a1a',
+            fontWeight: '700',
+            marginBottom: '4px',
+            lineHeight: '1.2'
+          }}>
+            {title}
+          </div>
+          {subtitle && (
+            <div style={{
+              fontSize: '9px',
+              color: (isPlaceholder || isNA) ? '#9ca3af' : '#6b7280',
+              lineHeight: '1.3'
+            }}>
+              {subtitle}
+            </div>
+          )}
+        </div>
+        <div style={{
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          background: colors.bg,
+          boxShadow: `0 0 0 2px ${colors.shadow}`,
+          flexShrink: 0
+        }} />
+      </div>
+
+      {/* Current value */}
+      <div style={{ marginTop: 'auto', marginBottom: 'auto' }}>
+        <div style={{
+          fontSize: '36px',
+          fontWeight: '700',
+          color: (isPlaceholder || isNA) ? '#9ca3af' : '#1a1a1a',
+          lineHeight: '1',
+          marginBottom: '12px'
+        }}>
+          {isNA ? '--' : current}
+        </div>
+        
+        {/* Target section */}
+        <div style={{
+          borderTop: '1px solid #e5e7eb',
+          paddingTop: '10px',
+          marginBottom: '12px'
+        }}>
+          <div style={{ 
+            fontSize: '9px', 
+            color: '#9ca3af', 
+            marginBottom: '3px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            {targetLabel}
+          </div>
+          <div style={{ 
+            fontSize: '18px', 
+            fontWeight: '700', 
+            color: (isPlaceholder || isNA) ? '#9ca3af' : '#4b5563'
+          }}>
+            {target}
+          </div>
+        </div>
+      </div>
+
+      {/* Progress and change indicator */}
+      <div style={{ marginTop: 'auto' }}>
+        <div style={{
+          width: '100%',
+          height: '6px',
+          background: '#f0f0f0',
+          borderRadius: '3px',
+          overflow: 'hidden',
+          marginBottom: '10px'
+        }}>
+          <div style={{
+            height: '100%',
+            background: colors.progressBg,
+            borderRadius: '3px',
+            width: `${progress}%`,
+            transition: 'width 1s ease'
+          }} />
+        </div>
+        
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '4px 8px',
+          background: change === 0 ? '#f3f4f6' : colors.changeBg,
+          borderRadius: '4px',
+          fontSize: '10px',
+          fontWeight: '600',
+          color: change === 0 ? '#6b7280' : colors.changeColor
+        }}>
+          {change !== 0 && <span style={{ fontSize: '12px' }}>{change > 0 ? '↑' : '↓'}</span>}
+          <span>{change === 0 ? 'No change' : `${change > 0 ? '+' : ''}${change}%`}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<ProductKPIDashboard />);
+    </script>
+</body>
+</html>
