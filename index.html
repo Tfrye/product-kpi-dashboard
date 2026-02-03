@@ -1,0 +1,1136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">import React, { useState, useEffect } from 'react';</p>
+<p class="p2"><br></p>
+<p class="p1">export default function ProductKPIDashboard() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Load saved data from localStorage or use defaults</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [kpiData, setKpiData] = useState(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const saved = localStorage.getItem('productKPIData');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (saved) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const parsedData = JSON.parse(saved);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Ensure initiatives exist, add default if missing</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!parsedData.initiatives) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>parsedData.initiatives = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 1, name: 'Health Cloud transformation (unify all products)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 2, name: 'Marketing Cloud re-platform + HC integration', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 3, name: 'IVR optimization (experience, conversion, quality)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 4, name: 'TPA &amp; claims processing re-platform + automation', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 5, name: 'Enterprise data architecture, quality, &amp; interoperability', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 6, name: 'Unified Member data store + governance (Member 360)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 7, name: 'Journey Conversion (FTUX, app, nudges, SMS)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 8, name: 'Health Here: program expansion + conversion', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 9, name: 'Outbound scalability (unified &amp; prioritized data, workflow, reporting)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 10, name: 'AI as a foundation (governance, platform, experiments, org adoption)', status: 'green', commentary: '' }</p>
+<p class="p1"><span class="Apple-converted-space">          </span>];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return parsedData;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.log('Could not load saved data');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>month: 'December',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>year: '2025',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>roadmapCurrent: 85,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>roadmapTarget: 80,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>roadmapChange: 16,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>roadmapColor: 'yellow',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>changeRequestsCurrent: 10,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>changeRequestsTarget: 4,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>changeRequestsChange: 0,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>changeRequestsColor: 'green',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backlogCurrent: 197,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backlogTarget: 125,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backlogChange: 9,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backlogColor: 'green',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>metric4Current: 0,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>metric4Target: 0,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>metric4Change: 0,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>metric4Name: 'TBD',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>initiatives: [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 1, name: 'Health Cloud transformation (unify all products)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 2, name: 'Marketing Cloud re-platform + HC integration', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 3, name: 'IVR optimization (experience, conversion, quality)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 4, name: 'TPA &amp; claims processing re-platform + automation', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 5, name: 'Enterprise data architecture, quality, &amp; interoperability', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 6, name: 'Unified Member data store + governance (Member 360)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 7, name: 'Journey Conversion (FTUX, app, nudges, SMS)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 8, name: 'Health Here: program expansion + conversion', status: 'yellow', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 9, name: 'Outbound scalability (unified &amp; prioritized data, workflow, reporting)', status: 'green', commentary: '' },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ id: 10, name: 'AI as a foundation (governance, platform, experiments, org adoption)', status: 'green', commentary: '' }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [previousData, setPreviousData] = useState(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const saved = localStorage.getItem('productKPIPreviousData');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (saved) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return JSON.parse(saved);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.log('No previous data found');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [showInputs, setShowInputs] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [showConfirmModal, setShowConfirmModal] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [skipChangeCalc, setSkipChangeCalc] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [expandedInitiative, setExpandedInitiative] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [editingInitiative, setEditingInitiative] = useState(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Save current data whenever it changes</p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>localStorage.setItem('productKPIData', JSON.stringify(kpiData));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error('Failed to save data:', error);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [kpiData]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const getStatusColor = (current, target, lowerIsBetter = false) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (lowerIsBetter) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (current &lt;= target) return 'green';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (current &lt;= target * 1.5) return 'yellow';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return 'red';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (current &gt;= target) return 'green';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (current &gt;= target * 0.8) return 'yellow';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return 'red';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const getProgressPercent = (current, target) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (current === 'N/A' || target === 'N/A') return 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return Math.min((current / target) * 100, 100);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const roadmapStatus = kpiData.roadmapCurrent === 'N/A' ? 'gray' : (kpiData.roadmapColor || 'yellow');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const changeRequestsStatus = kpiData.changeRequestsCurrent === 'N/A' ? 'gray' : (kpiData.changeRequestsColor || getStatusColor(kpiData.changeRequestsCurrent, kpiData.changeRequestsTarget, true));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const backlogStatus = kpiData.backlogCurrent === 'N/A' ? 'gray' : (kpiData.backlogColor || getStatusColor(kpiData.backlogCurrent, kpiData.backlogTarget));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const metric4Status = kpiData.metric4Name === 'TBD' || kpiData.metric4Current === 'N/A' ? 'gray' : getStatusColor(kpiData.metric4Current, kpiData.metric4Target);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleInputChange = (field, value) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>[field]: value</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const startNewMonth = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setShowConfirmModal(true);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const confirmStartNewMonth = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!skipChangeCalc) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Save current data as previous only if we want to track changes</p>
+<p class="p1"><span class="Apple-converted-space">        </span>localStorage.setItem('productKPIPreviousData', JSON.stringify(kpiData));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setPreviousData(kpiData);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Clear previous data so no changes are calculated</p>
+<p class="p1"><span class="Apple-converted-space">        </span>localStorage.removeItem('productKPIPreviousData');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setPreviousData(null);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Reset all change values to 0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">          </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>roadmapChange: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>changeRequestsChange: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>backlogChange: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>metric4Change: 0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>setShowConfirmModal(false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setShowInputs(true);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setSkipChangeCalc(false); // Reset for next time</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error('Save error:', error);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cancelStartNewMonth = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setShowConfirmModal(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const updateInitiativeStatus = (id, newStatus) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>initiatives: prev.initiatives.map(init =&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>init.id === id ? { ...init, status: newStatus } : init</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const updateInitiativeCommentary = (id, commentary) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>initiatives: prev.initiatives.map(init =&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>init.id === id ? { ...init, commentary } : init</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const updateInitiativeName = (id, name) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>initiatives: prev.initiatives.map(init =&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>init.id === id ? { ...init, name } : init</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const toggleExpand = (id) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setExpandedInitiative(expandedInitiative === id ? null : id);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setEditingInitiative(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Auto-calculate changes based on previous month</p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (previousData) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setKpiData(prev =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">        </span>...prev,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>roadmapChange: Math.round(prev.roadmapCurrent - previousData.roadmapCurrent),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>changeRequestsChange: Math.round(prev.changeRequestsCurrent - previousData.changeRequestsCurrent),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>backlogChange: Math.round(prev.backlogCurrent - previousData.backlogCurrent),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>metric4Change: previousData.metric4Current ? Math.round(prev.metric4Current - previousData.metric4Current) : 0</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [</p>
+<p class="p1"><span class="Apple-converted-space">    </span>kpiData.roadmapCurrent,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>kpiData.changeRequestsCurrent,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>kpiData.backlogCurrent,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>kpiData.metric4Current,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>previousData</p>
+<p class="p1"><span class="Apple-converted-space">  </span>]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const exportToPNG = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Simple instruction for user</p>
+<p class="p1"><span class="Apple-converted-space">    </span>alert('To save as image:\n1. Take a screenshot of the dashboard\n2. Or use browser print &gt; Save as PDF');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>minHeight: '100vh',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: '40px 20px'</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{/* Confirmation Modal */}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{showConfirmModal &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>position: 'fixed',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>top: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>left: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>right: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>bottom: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>background: 'rgba(0, 0, 0, 0.5)',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>alignItems: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>justifyContent: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>zIndex: 1000</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>borderRadius: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>maxWidth: '500px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>boxShadow: '0 20px 60px rgba(0,0,0,0.3)'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontSize: '20px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontWeight: '700',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>color: '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>marginBottom: '16px'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Save Current Period as Baseline?</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>color: '#666',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>lineHeight: '1.6',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>marginBottom: '20px'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>This will save current data and calculate changes automatically when you enter new values.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/p&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>alignItems: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>gap: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>marginBottom: '24px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>color: '#4b5563'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                </span>type="checkbox"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>checked={skipChangeCalc}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onChange={(e) =&gt; setSkipChangeCalc(e.target.checked)}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{ cursor: 'pointer' }}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Skip change calculation (use for first entry or when switching periods)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/label&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onClick={cancelStartNewMonth}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>padding: '10px 20px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>background: '#f3f4f6',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>color: '#4b5563',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>cursor: 'pointer'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Cancel</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onClick={confirmStartNewMonth}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>padding: '10px 20px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>cursor: 'pointer'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Confirm</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{ maxWidth: '1400px', margin: '0 auto' }}&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* Edit Button */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{ textAlign: 'right', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{previousData &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                </span>display: 'inline-block',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>padding: '8px 16px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>background: '#f3f4f6',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>color: '#6b7280'</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>📊 Previous: {previousData.month} {previousData.year}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{ display: 'flex', gap: '12px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onClick={startNewMonth}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                </span>padding: '12px 24px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>boxShadow: '0 4px 12px rgba(0,0,0,0.15)',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transition: 'all 0.3s ease'</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onMouseOver={(e) =&gt; e.target.style.transform = 'translateY(-2px)'}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onMouseOut={(e) =&gt; e.target.style.transform = 'translateY(0)'}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>📊 Update Period</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onClick={() =&gt; setShowInputs(!showInputs)}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                </span>padding: '12px 24px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>background: showInputs ? '#6b7280' : 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>color: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>border: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>boxShadow: '0 4px 12px rgba(0,0,0,0.15)',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>transition: 'all 0.3s ease'</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onMouseOver={(e) =&gt; e.target.style.transform = 'translateY(-2px)'}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>onMouseOut={(e) =&gt; e.target.style.transform = 'translateY(0)'}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{showInputs ? '✓ Done Editing' : '✏️ Edit KPI Data'}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* Input Panel */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{showInputs &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>borderRadius: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>marginBottom: '30px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>boxShadow: '0 8px 24px rgba(0,0,0,0.1)'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 style={{ marginBottom: '24px', color: '#1a1a1a', fontSize: '24px' }}&gt;Update Monthly Data&lt;/h2&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>{previousData &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                </span>padding: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>background: '#f0fdf4',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>marginBottom: '24px',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>border: '1px solid #bbf7d0'</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{ fontSize: '14px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>✓ Previous Month Saved - Changes Auto-Calculated</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{ fontSize: '13px', color: '#15803d' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Comparing to {previousData.month} {previousData.year}:<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Roadmap {previousData.roadmapCurrent}% → Change Requests {previousData.changeRequestsCurrent} → Backlog {previousData.backlogCurrent}%</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>)}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Period Label */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{ gridColumn: '1 / -1' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#667eea', fontSize: '15px', fontWeight: '700' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Reporting Period (e.g., "January 2026" or "Jan 1-15, 2026")</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={`${kpiData.month} ${kpiData.year}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const parts = e.target.value.split(' ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>handleInputChange('month', parts.slice(0, -1).join(' ') || e.target.value);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>handleInputChange('year', parts[parts.length - 1] || kpiData.year);</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '12px 16px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #667eea',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontWeight: '600'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>placeholder="e.g., January 2026 or Jan 1-15, 2026"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">              </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Month and Year - Hidden but kept for backward compatibility */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type="hidden" value={kpiData.month} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type="hidden" value={kpiData.year} /&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Roadmap Health */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Roadmap Current (%)</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="checkbox"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>checked={kpiData.roadmapCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={(e) =&gt; handleInputChange('roadmapCurrent', e.target.checked ? 'N/A' : 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{ marginLeft: 'auto' }}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span style={{ fontSize: '12px', color: '#9ca3af' }}&gt;N/A&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.roadmapCurrent === 'N/A' ? '' : kpiData.roadmapCurrent}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('roadmapCurrent', parseFloat(e.target.value) || 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>disabled={kpiData.roadmapCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: kpiData.roadmapCurrent === 'N/A' ? '#f3f4f6' : 'white'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Roadmap Target (%)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.roadmapTarget}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('roadmapTarget', parseFloat(e.target.value))}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{ gridColumn: '1 / -1' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Roadmap Health Status Color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{ display: 'flex', gap: '8px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{['green', 'yellow', 'red'].map(color =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>key={color}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>onClick={() =&gt; handleInputChange('roadmapColor', color)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>width: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>height: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>border: (kpiData.roadmapColor || 'yellow') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>transition: 'all 0.2s ease'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Change Requests */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Change Requests Current</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="checkbox"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>checked={kpiData.changeRequestsCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={(e) =&gt; handleInputChange('changeRequestsCurrent', e.target.checked ? 'N/A' : 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{ marginLeft: 'auto' }}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span style={{ fontSize: '12px', color: '#9ca3af' }}&gt;N/A&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.changeRequestsCurrent === 'N/A' ? '' : kpiData.changeRequestsCurrent}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('changeRequestsCurrent', parseFloat(e.target.value) || 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>disabled={kpiData.changeRequestsCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: kpiData.changeRequestsCurrent === 'N/A' ? '#f3f4f6' : 'white'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Change Requests Target</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.changeRequestsTarget}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('changeRequestsTarget', parseFloat(e.target.value))}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{ gridColumn: '1 / -1' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Change Requests Status Color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{ display: 'flex', gap: '8px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{['green', 'yellow', 'red'].map(color =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>key={color}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>onClick={() =&gt; handleInputChange('changeRequestsColor', color)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>width: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>height: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>border: (kpiData.changeRequestsColor || 'green') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>transition: 'all 0.2s ease'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Backlog Health */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Backlog Current (%)</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="checkbox"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>checked={kpiData.backlogCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={(e) =&gt; handleInputChange('backlogCurrent', e.target.checked ? 'N/A' : 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{ marginLeft: 'auto' }}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span style={{ fontSize: '12px', color: '#9ca3af' }}&gt;N/A&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.backlogCurrent === 'N/A' ? '' : kpiData.backlogCurrent}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('backlogCurrent', parseFloat(e.target.value) || 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>disabled={kpiData.backlogCurrent === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: kpiData.backlogCurrent === 'N/A' ? '#f3f4f6' : 'white'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Backlog Target (%)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.backlogTarget}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('backlogTarget', parseFloat(e.target.value))}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{ gridColumn: '1 / -1' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>Backlog Health Status Color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{ display: 'flex', gap: '8px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{['green', 'yellow', 'red'].map(color =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>key={color}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>onClick={() =&gt; handleInputChange('backlogColor', color)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>width: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>height: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>border: (kpiData.backlogColor || 'green') === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>transition: 'all 0.2s ease'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* 4th Metric */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>4th Metric Name</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.metric4Name}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('metric4Name', e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>placeholder="Future metric name"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>4th Metric Current</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="checkbox"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>checked={kpiData.metric4Current === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={(e) =&gt; handleInputChange('metric4Current', e.target.checked ? 'N/A' : 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{ marginLeft: 'auto' }}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span style={{ fontSize: '12px', color: '#9ca3af' }}&gt;N/A&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.metric4Current === 'N/A' ? '' : kpiData.metric4Current}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('metric4Current', parseFloat(e.target.value) || 0)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>disabled={kpiData.metric4Current === 'N/A'}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: kpiData.metric4Current === 'N/A' ? '#f3f4f6' : 'white'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style={{ display: 'block', marginBottom: '8px', color: '#666', fontSize: '14px', fontWeight: '600' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>4th Metric Target</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>value={kpiData.metric4Target}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onChange={(e) =&gt; handleInputChange('metric4Target', parseFloat(e.target.value))}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '15px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* Dashboard Header */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{ textAlign: 'center', marginBottom: '50px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontSize: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: '#666',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontWeight: '500',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>textTransform: 'uppercase',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>letterSpacing: '1px'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{kpiData.month} {kpiData.year}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h1 style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontSize: '42px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontWeight: '700',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>letterSpacing: '-0.5px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>marginTop: '10px'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Product Department KPIs</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* KPI Cards Grid */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>display: 'grid',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>gridTemplateColumns: 'repeat(3, 1fr)',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>gap: '24px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marginTop: '40px'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{/* Roadmap Health Card */}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;KPICard</p>
+<p class="p1"><span class="Apple-converted-space">            </span>title="Roadmap Health"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>subtitle="Quarterly metric: Cumulative within the quarter; resets each quarter"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>current={kpiData.roadmapCurrent === 'N/A' ? 'N/A' : `${kpiData.roadmapCurrent}%`}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>target={`${kpiData.roadmapTarget}%`}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetLabel="TARGET"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>change={kpiData.roadmapChange}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>status={roadmapStatus}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>progress={getProgressPercent(kpiData.roadmapCurrent, kpiData.roadmapTarget)}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>/&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{/* Change Requests Card */}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;KPICard</p>
+<p class="p1"><span class="Apple-converted-space">            </span>title="Approved Change Requests"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>subtitle="Minor &amp; Major impact classifications (3 Minors = 1 Major)"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>current={kpiData.changeRequestsCurrent === 'N/A' ? 'N/A' : kpiData.changeRequestsCurrent}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>target={kpiData.changeRequestsTarget}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetLabel="Target Impact Score"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>change={kpiData.changeRequestsChange}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>status={changeRequestsStatus}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>progress={100}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>/&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{/* Backlog Health Card */}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;KPICard</p>
+<p class="p1"><span class="Apple-converted-space">            </span>title="Backlog Health"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>subtitle="Sprints of refined work queued. Target: 1.25 sprints ahead"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>current={kpiData.backlogCurrent === 'N/A' ? 'N/A' : `${kpiData.backlogCurrent}%`}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>target={`${kpiData.backlogTarget}%`}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetLabel="Target"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>change={kpiData.backlogChange}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>status={backlogStatus}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>progress={100}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* Top 10 Initiatives Section */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marginTop: '40px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>background: 'white',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderRadius: '16px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>padding: '28px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>boxShadow: '0 4px 16px rgba(0,0,0,0.06)'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>borderBottom: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>paddingBottom: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>marginBottom: '20px'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontSize: '22px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontWeight: '700',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>color: '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>margin: 0</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Top 10 Product Initiatives</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: 'grid',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>gridTemplateColumns: 'repeat(2, 1fr)',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: '10px'<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{(kpiData.initiatives || []).map((initiative) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div key={initiative.id} style={{</p>
+<p class="p1"><span class="Apple-converted-space">                </span>gridColumn: expandedInitiative === initiative.id ? '1 / -1' : 'auto',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>flexDirection: 'column'</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{/* Compact Row */}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; toggleExpand(initiative.id)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>alignItems: 'flex-start',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: expandedInitiative === initiative.id ? '#f9fafb' : 'white',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '1px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>transition: 'all 0.2s ease',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>minHeight: '60px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>flex: 1</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onMouseOver={(e) =&gt; e.currentTarget.style.background = '#f9fafb'}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onMouseOut={(e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (expandedInitiative !== initiative.id) {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>e.currentTarget.style.background = 'white';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>width: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>height: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: initiative.status === 'green' ? '#22c55e' : initiative.status === 'yellow' ? '#f59e0b' : '#ef4444',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>marginRight: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>flexShrink: 0,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>marginTop: '2px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}} /&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                  </span></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>flex: 1,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontSize: '13px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>color: '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>fontWeight: '500',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>lineHeight: '1.4',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>wordWrap: 'break-word',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>overflowWrap: 'break-word'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;{initiative.name}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{initiative.commentary &amp;&amp; expandedInitiative !== initiative.id &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontSize: '11px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>color: '#6b7280',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>marginTop: '4px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontWeight: '400',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>lineHeight: '1.3',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontStyle: 'italic'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{initiative.commentary.length &gt; 60<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>? `${initiative.commentary.substring(0, 60)}...`<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>: initiative.commentary}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{/* Expanded Detail */}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{expandedInitiative === initiative.id &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>padding: '20px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>background: '#f9fafb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>border: '1px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderTop: 'none',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: '0 0 8px 8px',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>marginTop: '-8px'</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{/* Initiative Name Editor */}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div style={{ marginBottom: '16px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>display: 'block',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontSize: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>color: '#6b7280',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>marginBottom: '8px'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Initiative Name</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>value={initiative.name}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onChange={(e) =&gt; updateInitiativeName(initiative.id, e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>padding: '10px 12px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontFamily: 'inherit'</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label style={{</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>display: 'block',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontSize: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>color: '#6b7280',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>marginBottom: '8px'</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>Status</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style={{ display: 'flex', gap: '8px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{['green', 'yellow', 'red'].map(color =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>key={color}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>onClick={() =&gt; updateInitiativeStatus(initiative.id, color)}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>width: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>height: '32px',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>background: color === 'green' ? '#22c55e' : color === 'yellow' ? '#f59e0b' : '#ef4444',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>border: initiative.status === color ? '3px solid #1a1a1a' : '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>cursor: 'pointer',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>transition: 'all 0.2s ease'</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label style={{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>display: 'block',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontSize: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>color: '#6b7280',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>marginBottom: '8px'</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Commentary / Notes</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;textarea</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>value={initiative.commentary}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onChange={(e) =&gt; updateInitiativeCommentary(initiative.id, e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>placeholder="Add context, updates, blockers, or notes..."</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>minHeight: '80px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>padding: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>border: '2px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>borderRadius: '8px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontSize: '14px',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>fontFamily: 'inherit',</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>resize: 'vertical'</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function KPICard({ title, subtitle, current, target, targetLabel = "Target", change, status, progress, isPlaceholder = false }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Check if current value is N/A or empty</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const isNA = current === 'N/A' || current === '--';</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const statusColors = {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>green: { bg: '#22c55e', shadow: 'rgba(34, 197, 94, 0.2)', progressBg: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', changeBg: '#f0fdf4', changeColor: '#22c55e' },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>red: { bg: '#ef4444', shadow: 'rgba(239, 68, 68, 0.2)', progressBg: 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)', changeBg: '#fef2f2', changeColor: '#ef4444' },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>yellow: { bg: '#f59e0b', shadow: 'rgba(245, 158, 11, 0.2)', progressBg: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)', changeBg: '#fffbeb', changeColor: '#f59e0b' },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gray: { bg: '#9ca3af', shadow: 'rgba(156, 163, 175, 0.2)', progressBg: 'linear-gradient(90deg, #d1d5db 0%, #9ca3af 100%)', changeBg: '#f3f4f6', changeColor: '#6b7280' }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Use gray for placeholder or N/A values, otherwise use the status color</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const colors = (isPlaceholder || isNA) ? statusColors.gray : statusColors[status];</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: (isPlaceholder || isNA) ? '#f9fafb' : 'white',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>borderRadius: '12px',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: '20px',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>boxShadow: '0 4px 16px rgba(0,0,0,0.08)',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: 'relative',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>overflow: 'hidden',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: 'transform 0.3s ease, box-shadow 0.3s ease',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: (isPlaceholder || isNA) ? 0.7 : 1,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>flexDirection: 'column'</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>position: 'absolute',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>top: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>left: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>right: 0,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>height: '3px',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>background: (isPlaceholder || isNA) ? '#e5e7eb' : 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}} /&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{/* Header with title and status */}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>display: 'flex',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>justifyContent: 'space-between',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alignItems: 'flex-start',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>marginBottom: '8px'</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{ flex: 1, paddingRight: '8px' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontSize: '13px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: (isPlaceholder || isNA) ? '#9ca3af' : '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontWeight: '700',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>marginBottom: '4px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>lineHeight: '1.2'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{title}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{subtitle &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>fontSize: '9px',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>color: (isPlaceholder || isNA) ? '#9ca3af' : '#6b7280',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>lineHeight: '1.3'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{subtitle}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>width: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>height: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderRadius: '50%',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>background: colors.bg,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>boxShadow: `0 0 0 2px ${colors.shadow}`,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>flexShrink: 0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{/* Current value */}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{ marginTop: 'auto', marginBottom: 'auto' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fontSize: '36px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fontWeight: '700',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>color: (isPlaceholder || isNA) ? '#9ca3af' : '#1a1a1a',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>lineHeight: '1',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marginBottom: '12px'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{isNA ? '--' : current}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{/* Target section */}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderTop: '1px solid #e5e7eb',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>paddingTop: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marginBottom: '12px'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontSize: '9px',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: '#9ca3af',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>marginBottom: '3px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>textTransform: 'uppercase',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>letterSpacing: '0.5px'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{targetLabel}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontSize: '18px',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>fontWeight: '700',<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: (isPlaceholder || isNA) ? '#9ca3af' : '#4b5563'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{target}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{/* Progress and change indicator */}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{ marginTop: 'auto' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>width: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>height: '6px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>background: '#f0f0f0',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderRadius: '3px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>overflow: 'hidden',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marginBottom: '10px'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: '100%',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: colors.progressBg,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>borderRadius: '3px',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: `${progress}%`,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: 'width 1s ease'</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>display: 'inline-flex',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>alignItems: 'center',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>gap: '3px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>padding: '4px 8px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>background: change === 0 ? '#f3f4f6' : colors.changeBg,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderRadius: '4px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fontSize: '10px',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fontWeight: '600',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>color: change === 0 ? '#6b7280' : colors.changeColor</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{change !== 0 &amp;&amp; &lt;span style={{ fontSize: '12px' }}&gt;{change &gt; 0 ? '↑' : '↓'}&lt;/span&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;{change === 0 ? 'No change' : `${change &gt; 0 ? '+' : ''}${change}%`}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+</body>
+</html>
