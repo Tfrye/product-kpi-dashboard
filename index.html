@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Department KPIs</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+        .btn-secondary { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+        .btn-done { background: #6b7280; }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .page-header-date {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .page-header-title {
+            font-size: 42px;
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        
+        .kpi-card.na { background: #f9fafb; opacity: 0.7; }
+        
+        .kpi-card-top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .kpi-card.na .kpi-card-top-bar { background: #e5e7eb; }
+        
+        .kpi-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-card-title h3 {
+            font-size: 13px;
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .kpi-card.na .kpi-card-title h3 { color: #9ca3af; }
+        
+        .kpi-card-subtitle {
+            font-size: 9px;
+            color: #6b7280;
+            line-height: 1.3;
+        }
+        
+        .kpi-card.na .kpi-card-subtitle { color: #9ca3af; }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .status-green { background: #22c55e; box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2); }
+        .status-yellow { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
+        .status-red { background: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+        .status-gray { background: #9ca3af; box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2); }
+        
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1;
+            margin: 12px 0;
+        }
+        
+        .kpi-card.na .kpi-value { color: #9ca3af; }
+        
+        .kpi-target {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .kpi-target-label {
+            font-size: 9px;
+            color: #9ca3af;
+            margin-bottom: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .kpi-target-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4b5563;
+        }
+        
+        .kpi-card.na .kpi-target-value { color: #9ca3af; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+        
+        .progress-yellow { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+        .progress-green { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+        .progress-red { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+        .progress-gray { background: linear-gradient(90deg, #d1d5db 0%, #9ca3af 100%); }
+        
+        .change-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .change-neutral { background: #f3f4f6; color: #6b7280; }
+        .change-green { background: #f0fdf4; color: #22c55e; }
+        .change-yellow { background: #fffbeb; color: #f59e0b; }
+        .change-red { background: #fef2f2; color: #ef4444; }
+        
+        .initiatives {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        
+        .initiatives-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .initiatives-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .initiatives-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .initiative-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .initiative-card:hover { background: #f9fafb; }
+        
+        .initiative-card.expanded {
+            flex-direction: column;
+            align-items: flex-start;
+            grid-column: 1 / -1;
+            background: #f9fafb;
+        }
+        
+        .initiative-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .initiative-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .initiative-content {
+            flex: 1;
+            font-size: 13px;
+            color: #1a1a1a;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .initiative-commentary {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+        
+        .initiative-expanded {
+            width: 100%;
+            padding: 20px 0 0 0;
+            margin-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .status-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .status-button.selected { border: 3px solid #1a1a1a; }
+        .status-button.green { background: #22c55e; }
+        .status-button.yellow { background: #f59e0b; }
+        .status-button.red { background: #ef4444; }
+        
+        .edit-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .edit-panel.show { display: block; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.show { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-buttons">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div id="previousInfo"></div>
+                <div id="monthNavigation" style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn" style="background: #6b7280; padding: 8px 16px;" onclick="navigateMonth('prev')" id="prevBtn">◀ Prev</button>
+                    <select id="monthSelector" onchange="changeMonth(this.value)" style="padding: 10px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <option value="January 2026">January 2026</option>
+                    </select>
+                    <button class="btn" style="background: #6b7280; padding: 8px 16px;" onclick="navigateMonth('next')" id="nextBtn">Next ▶</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="showAddPeriodModal()">➕ Add New Period</button>
+                <button class="btn btn-secondary" id="editBtn" onclick="toggleEdit()">✏️ Edit KPI Data</button>
+            </div>
+        </div>
+
+        <div class="edit-panel" id="editPanel">
+            <h2 style="margin-bottom: 24px; color: #1a1a1a; font-size: 24px;">Update Monthly Data</h2>
+            
+            <div id="csvDropZone" style="border: 2px dashed #667eea; border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 24px; background: #f9fafb; cursor: pointer; transition: all 0.3s;" onclick="document.getElementById('csvFileInput').click()">
+                <div style="font-size: 48px; margin-bottom: 8px;">📂</div>
+                <div style="font-size: 16px; font-weight: 600; color: #667eea; margin-bottom: 4px;">Import CSV Data</div>
+                <div style="font-size: 13px; color: #6b7280;">Click to browse or drag & drop CSV file here</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Supports single month or multiple months in one CSV</div>
+                <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+            </div>
+            
+            <div class="form-grid">
+                <div style="grid-column: 1 / -1;">
+                    <label style="color: #667eea; font-size: 15px; font-weight: 700;">Reporting Period</label>
+                    <input type="text" id="period" value="January 2026">
+                </div>
+                
+                <div class="form-group">
+                    <label>Roadmap Current (%) <input type="checkbox" id="roadmapNA" style="width: auto; margin-left: 10px;"> N/A</label>
+                    <input type="number" id="roadmapCurrent" value="18">
+                </div>
+                <div class="form-group">
+                    <label>Roadmap Target (%)</label>
+                    <input type="number" id="roadmapTarget" value="26">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Roadmap Health Status Color</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="status-button green" onclick="setMetricColor('roadmap', 'green')" id="roadmapGreen"></button>
+                        <button type="button" class="status-button yellow selected" onclick="setMetricColor('roadmap', 'yellow')" id="roadmapYellow"></button>
+                        <button type="button" class="status-button red" onclick="setMetricColor('roadmap', 'red')" id="roadmapRed"></button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Change Requests Current <input type="checkbox" id="changeNA" style="width: auto; margin-left: 10px;"> N/A</label>
+                    <input type="number" id="changeCurrent" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Change Requests Target</label>
+                    <input type="number" id="changeTarget" value="4">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Change Requests Status Color</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="status-button green selected" onclick="setMetricColor('change', 'green')" id="changeGreen"></button>
+                        <button type="button" class="status-button yellow" onclick="setMetricColor('change', 'yellow')" id="changeYellow"></button>
+                        <button type="button" class="status-button red" onclick="setMetricColor('change', 'red')" id="changeRed"></button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Backlog Current (%) <input type="checkbox" id="backlogNA" style="width: auto; margin-left: 10px;"> N/A</label>
+                    <input type="text" id="backlogCurrent" value="N/A">
+                </div>
+                <div class="form-group">
+                    <label>Backlog Target (%)</label>
+                    <input type="number" id="backlogTarget" value="125">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Backlog Health Status Color</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="status-button green selected" onclick="setMetricColor('backlog', 'green')" id="backlogGreen"></button>
+                        <button type="button" class="status-button yellow" onclick="setMetricColor('backlog', 'yellow')" id="backlogYellow"></button>
+                        <button type="button" class="status-button red" onclick="setMetricColor('backlog', 'red')" id="backlogRed"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <div class="page-header-date" id="dateDisplay">JANUARY 2026</div>
+            <h1 class="page-header-title">Product Department KPIs</h1>
+        </div>
+
+        <div class="kpi-grid" id="kpiGrid"></div>
+        
+        <div class="initiatives">
+            <div class="initiatives-header">
+                <h2>Top 10 Product Initiatives</h2>
+            </div>
+            <div class="initiatives-grid" id="initiativesGrid"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="addPeriodModal">
+        <div class="modal-content">
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #1a1a1a;">Add New Period</h3>
+            <p style="font-size: 15px; color: #666; margin-bottom: 20px; line-height: 1.6;">Create a new reporting period. You can start with defaults or copy data from an existing period.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 8px;">Period Name</label>
+                <input type="text" id="newPeriodName" placeholder="e.g., Feb 15-29, 2026" style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px;">
+            </div>
+            
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 8px;">Copy data from</label>
+                <select id="copyFromPeriod" style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; cursor: pointer;">
+                    <option value="_defaults">Start with default values</option>
+                    <option value="_current">Copy from current period</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn" style="background: #f3f4f6; color: #4b5563;" onclick="closeAddPeriodModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmAddPeriod()">Create Period</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Historical data structure
+        let historicalData = {};
+        let currentMonth = 'January 2026';
+        let expandedInitiative = null;
+        
+        // Default single month data
+        const defaultData = {
+            period: 'January 2026',
+            roadmapCurrent: 18,
+            roadmapTarget: 26,
+            roadmapChange: 0,
+            roadmapColor: 'yellow',
+            changeCurrent: 0,
+            changeTarget: 4,
+            changeChange: 0,
+            changeColor: 'green',
+            backlogCurrent: 'N/A',
+            backlogTarget: 125,
+            backlogChange: 0,
+            backlogColor: 'green',
+            initiatives: [
+                { id: 1, name: 'Health Cloud transformation (unify all products)', status: 'green', commentary: '' },
+                { id: 2, name: 'Marketing Cloud re-platform + HC integration', status: 'yellow', commentary: '' },
+                { id: 3, name: 'IVR optimization (experience, conversion, quality)', status: 'green', commentary: '' },
+                { id: 4, name: 'TPA & claims processing re-platform + automation', status: 'green', commentary: '' },
+                { id: 5, name: 'Enterprise data architecture, quality, & interoperability', status: 'yellow', commentary: '' },
+                { id: 6, name: 'Unified Member data store + governance (Member 360)', status: 'green', commentary: '' },
+                { id: 7, name: 'Journey Conversion (FTUX, app, nudges, SMS)', status: 'green', commentary: '' },
+                { id: 8, name: 'Health Here: program expansion + conversion', status: 'yellow', commentary: '' },
+                { id: 9, name: 'Outbound scalability (unified & prioritized data, workflow, reporting)', status: 'green', commentary: '' },
+                { id: 10, name: 'AI as a foundation (governance, platform, experiments, org adoption)', status: 'green', commentary: '' }
+            ]
+        };
+        
+        // Initialize with default data
+        historicalData['January 2026'] = JSON.parse(JSON.stringify(defaultData));
+        
+        // Helper functions
+        function getCurrentData() {
+            return historicalData[currentMonth] || defaultData;
+        }
+        
+        function getAvailableMonths() {
+            return Object.keys(historicalData).sort((a, b) => {
+                const [monthA, yearA] = a.split(' ');
+                const [monthB, yearB] = b.split(' ');
+                const dateA = new Date(yearA, getMonthNumber(monthA));
+                const dateB = new Date(yearB, getMonthNumber(monthB));
+                return dateA - dateB;
+            });
+        }
+        
+        function getMonthNumber(monthName) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            return months.indexOf(monthName);
+        }
+        
+        function navigateMonth(direction) {
+            const months = getAvailableMonths();
+            const currentIndex = months.indexOf(currentMonth);
+            if (direction === 'prev' && currentIndex > 0) {
+                currentMonth = months[currentIndex - 1];
+            } else if (direction === 'next' && currentIndex < months.length - 1) {
+                currentMonth = months[currentIndex + 1];
+            }
+            render();
+        }
+
+        // Load data
+        function loadData() {
+            const saved = localStorage.getItem('kpiHistoricalData');
+            if (saved) {
+                historicalData = JSON.parse(saved);
+            }
+            const savedMonth = localStorage.getItem('kpiCurrentMonth');
+            if (savedMonth && historicalData[savedMonth]) {
+                currentMonth = savedMonth;
+            }
+            render();
+        }
+
+        function saveData() {
+            localStorage.setItem('kpiHistoricalData', JSON.stringify(historicalData));
+            localStorage.setItem('kpiCurrentMonth', currentMonth);
+        }
+        
+        function changeMonth(month) {
+            currentMonth = month;
+            saveData();
+            render();
+        }
+
+        function setMetricColor(metric, color) {
+            const data = getCurrentData();
+            data[metric + 'Color'] = color;
+            historicalData[currentMonth] = data;
+            ['green', 'yellow', 'red'].forEach(c => {
+                document.getElementById(metric + c.charAt(0).toUpperCase() + c.slice(1)).classList.remove('selected');
+            });
+            document.getElementById(metric + color.charAt(0).toUpperCase() + color.slice(1)).classList.add('selected');
+            saveData();
+            render();
+        }
+
+        function toggleInitiative(id) {
+            expandedInitiative = expandedInitiative === id ? null : id;
+            renderInitiatives();
+        }
+
+        function updateInitiative(id, field, value) {
+            const init = data.initiatives.find(i => i.id === id);
+            if (init) {
+                init[field] = value;
+                saveData();
+                renderInitiatives();
+            }
+        }
+
+        function render() {
+            const data = getCurrentData();
+            
+            // Update month selector
+            const selector = document.getElementById('monthSelector');
+            const months = getAvailableMonths();
+            selector.innerHTML = months.map(m => 
+                `<option value="${m}" ${m === currentMonth ? 'selected' : ''}>${m}</option>`
+            ).join('');
+            
+            // Update navigation buttons
+            const currentIndex = months.indexOf(currentMonth);
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === months.length - 1;
+            
+            document.getElementById('dateDisplay').textContent = data.period.toUpperCase();
+            document.getElementById('period').value = data.period;
+            
+            // Update form
+            document.getElementById('roadmapCurrent').value = data.roadmapCurrent === 'N/A' ? '' : data.roadmapCurrent;
+            document.getElementById('roadmapTarget').value = data.roadmapTarget;
+            document.getElementById('roadmapNA').checked = data.roadmapCurrent === 'N/A';
+            
+            document.getElementById('changeCurrent').value = data.changeCurrent === 'N/A' ? '' : data.changeCurrent;
+            document.getElementById('changeTarget').value = data.changeTarget;
+            document.getElementById('changeNA').checked = data.changeCurrent === 'N/A';
+            
+            document.getElementById('backlogCurrent').value = data.backlogCurrent;
+            document.getElementById('backlogTarget').value = data.backlogTarget;
+            document.getElementById('backlogNA').checked = data.backlogCurrent === 'N/A';
+            
+            // Update color button selections
+            ['roadmap', 'change', 'backlog'].forEach(metric => {
+                ['green', 'yellow', 'red'].forEach(color => {
+                    const btn = document.getElementById(metric + color.charAt(0).toUpperCase() + color.slice(1));
+                    if (btn) {
+                        btn.classList.remove('selected');
+                        if (data[metric + 'Color'] === color) {
+                            btn.classList.add('selected');
+                        }
+                    }
+                });
+            });
+            
+            renderKPIs();
+            renderInitiatives();
+        }
+
+        function renderKPIs() {
+            const data = getCurrentData();
+            const grid = document.getElementById('kpiGrid');
+            grid.innerHTML = `
+                ${renderKPI('Roadmap Health', 'Quarterly metric: Cumulative within the quarter; resets each quarter', 
+                    data.roadmapCurrent === 'N/A' ? '--' : data.roadmapCurrent + '%', 
+                    data.roadmapTarget + '%', 'TARGET', data.roadmapChange, data.roadmapColor, data.roadmapCurrent === 'N/A')}
+                ${renderKPI('Approved Change Requests', 'Minor & Major impact classifications (3 Minors = 1 Major)', 
+                    data.changeCurrent === 'N/A' ? '--' : data.changeCurrent, 
+                    data.changeTarget, 'Target Impact Score', data.changeChange, data.changeColor, data.changeCurrent === 'N/A')}
+                ${renderKPI('Backlog Health', 'Sprints of refined work queued. Target: 1.25 sprints ahead', 
+                    data.backlogCurrent === 'N/A' ? '--' : data.backlogCurrent + '%', 
+                    data.backlogTarget + '%', 'Target', data.backlogChange, data.backlogColor, data.backlogCurrent === 'N/A')}
+            `;
+        }
+
+        function renderKPI(title, subtitle, current, target, targetLabel, change, status, isNA) {
+            const progress = current === '--' ? 0 : 100;
+            return `
+                <div class="kpi-card ${isNA ? 'na' : ''}">
+                    <div class="kpi-card-top-bar"></div>
+                    <div class="kpi-card-header">
+                        <div class="kpi-card-title">
+                            <h3>${title}</h3>
+                            <div class="kpi-card-subtitle">${subtitle}</div>
+                        </div>
+                        <div class="status-dot status-${isNA ? 'gray' : status}"></div>
+                    </div>
+                    <div class="kpi-value">${current}</div>
+                    <div class="kpi-target">
+                        <div class="kpi-target-label">${targetLabel}</div>
+                        <div class="kpi-target-value">${target}</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-${isNA ? 'gray' : status}" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="change-badge ${change === 0 ? 'change-neutral' : 'change-' + status}">
+                        ${change !== 0 ? (change > 0 ? '↑' : '↓') : ''}
+                        ${change === 0 ? 'No change' : (change > 0 ? '+' : '') + change + '%'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInitiatives() {
+            const data = getCurrentData();
+            const grid = document.getElementById('initiativesGrid');
+            grid.innerHTML = data.initiatives.map(init => {
+                const isExpanded = expandedInitiative === init.id;
+                const colorMap = { green: '#22c55e', yellow: '#f59e0b', red: '#ef4444' };
+                return `
+                <div class="initiative-card ${isExpanded ? 'expanded' : ''}">
+                    <div class="initiative-row" onclick="toggleInitiative(${init.id})">
+                        <div class="initiative-dot" style="background: ${colorMap[init.status]};"></div>
+                        <div class="initiative-content">
+                            <div>${init.name}</div>
+                            ${init.commentary && !isExpanded ? `<div class="initiative-commentary">${init.commentary.length > 60 ? init.commentary.substring(0, 60) + '...' : init.commentary}</div>` : ''}
+                        </div>
+                    </div>
+                    ${isExpanded ? `
+                        <div class="initiative-expanded" onclick="event.stopPropagation()">
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Initiative Name</label>
+                                <input type="text" value="${init.name}" onchange="updateInitiative(${init.id}, 'name', this.value)" style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Status</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" class="status-button green ${init.status === 'green' ? 'selected' : ''}" onclick="updateInitiative(${init.id}, 'status', 'green')"></button>
+                                    <button type="button" class="status-button yellow ${init.status === 'yellow' ? 'selected' : ''}" onclick="updateInitiative(${init.id}, 'status', 'yellow')"></button>
+                                    <button type="button" class="status-button red ${init.status === 'red' ? 'selected' : ''}" onclick="updateInitiative(${init.id}, 'status', 'red')"></button>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Commentary / Notes</label>
+                                <textarea onchange="updateInitiative(${init.id}, 'commentary', this.value)" placeholder="Add context, updates, blockers, or notes..." style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; resize: vertical;">${init.commentary}</textarea>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `}).join('');
+        }
+        
+        function updateInitiative(id, field, value) {
+            const data = getCurrentData();
+            const init = data.initiatives.find(i => i.id === id);
+            if (init) {
+                init[field] = value;
+                historicalData[currentMonth] = data;
+                saveData();
+                renderInitiatives();
+            }
+        }
+        
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const months = parseCSV(csv);
+                    
+                    if (months.length === 0) {
+                        alert('No valid data found in CSV');
+                        return;
+                    }
+                    
+                    // Sort months chronologically before processing
+                    months.sort((a, b) => {
+                        const dateA = new Date(a.period);
+                        const dateB = new Date(b.period);
+                        return dateA - dateB;
+                    });
+                    
+                    // Add all months to historical data and auto-calculate changes
+                    months.forEach((monthData, index) => {
+                        historicalData[monthData.period] = monthData;
+                        
+                        // Auto-calculate changes based on previous month in the array
+                        if (index > 0) {
+                            const previousMonth = months[index - 1];
+                            
+                            if (monthData.roadmapCurrent !== 'N/A' && previousMonth.roadmapCurrent !== 'N/A') {
+                                monthData.roadmapChange = Math.round(monthData.roadmapCurrent - previousMonth.roadmapCurrent);
+                            }
+                            
+                            if (monthData.changeCurrent !== 'N/A' && previousMonth.changeCurrent !== 'N/A') {
+                                monthData.changeChange = Math.round(monthData.changeCurrent - previousMonth.changeCurrent);
+                            }
+                            
+                            if (monthData.backlogCurrent !== 'N/A' && previousMonth.backlogCurrent !== 'N/A') {
+                                monthData.backlogChange = Math.round(monthData.backlogCurrent - previousMonth.backlogCurrent);
+                            }
+                        }
+                    });
+                    
+                    // Set current month to the last imported month
+                    currentMonth = months[months.length - 1].period;
+                    
+                    saveData();
+                    render();
+                    
+                    alert(`Successfully imported ${months.length} period(s) with auto-calculated changes!`);
+                    
+                    // Close edit panel
+                    document.getElementById('editPanel').classList.remove('show');
+                    document.getElementById('editBtn').textContent = '✏️ Edit KPI Data';
+                    document.getElementById('editBtn').className = 'btn btn-secondary';
+                    
+                } catch (error) {
+                    alert('Error parsing CSV: ' + error.message);
+                    console.error('CSV parse error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) {
+                throw new Error('CSV must have header row and at least one data row');
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const months = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values.length !== headers.length) continue;
+                
+                const monthData = {};
+                headers.forEach((header, index) => {
+                    monthData[header] = values[index];
+                });
+                
+                // Convert to dashboard format
+                const dashboardData = {
+                    period: `${monthData.Month || monthData.month} ${monthData.Year || monthData.year}`,
+                    roadmapCurrent: monthData.Roadmap_Current === 'N/A' ? 'N/A' : parseFloat(monthData.Roadmap_Current) || 0,
+                    roadmapTarget: parseFloat(monthData.Roadmap_Target) || 0,
+                    roadmapChange: 0, // Will be calculated
+                    roadmapColor: monthData.Roadmap_Color || 'yellow',
+                    changeCurrent: monthData.Change_Current === 'N/A' ? 'N/A' : parseFloat(monthData.Change_Current) || 0,
+                    changeTarget: parseFloat(monthData.Change_Target) || 0,
+                    changeChange: 0, // Will be calculated
+                    changeColor: monthData.Change_Color || 'green',
+                    backlogCurrent: monthData.Backlog_Current === 'N/A' ? 'N/A' : parseFloat(monthData.Backlog_Current) || 0,
+                    backlogTarget: parseFloat(monthData.Backlog_Target) || 0,
+                    backlogChange: 0, // Will be calculated
+                    backlogColor: monthData.Backlog_Color || 'green',
+                    initiatives: defaultData.initiatives.map(init => ({...init}))
+                };
+                
+                months.push(dashboardData);
+            }
+            
+            return months;
+        }
+        
+        // Setup drag and drop
+        window.addEventListener('DOMContentLoaded', () => {
+            const dropZone = document.getElementById('csvDropZone');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#667eea';
+                dropZone.style.background = '#eef2ff';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '';
+                dropZone.style.background = '#f9fafb';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '';
+                dropZone.style.background = '#f9fafb';
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.name.endsWith('.csv')) {
+                    document.getElementById('csvFileInput').files = e.dataTransfer.files;
+                    handleCSVUpload({target: {files: [file]}});
+                }
+            });
+        });
+
+        function toggleEdit() {
+            const panel = document.getElementById('editPanel');
+            const btn = document.getElementById('editBtn');
+            const isShowing = panel.classList.contains('show');
+            
+            if (isShowing) {
+                panel.classList.remove('show');
+                btn.textContent = '✏️ Edit KPI Data';
+                btn.className = 'btn btn-secondary';
+                updateFromForm();
+            } else {
+                panel.classList.add('show');
+                btn.textContent = '✓ Done Editing';
+                btn.className = 'btn btn-done';
+            }
+        }
+
+        function updateFromForm() {
+            const data = getCurrentData();
+            data.period = document.getElementById('period').value;
+            data.roadmapCurrent = document.getElementById('roadmapNA').checked ? 'N/A' : (parseFloat(document.getElementById('roadmapCurrent').value) || 0);
+            data.roadmapTarget = parseFloat(document.getElementById('roadmapTarget').value) || 0;
+            data.changeCurrent = document.getElementById('changeNA').checked ? 'N/A' : (parseFloat(document.getElementById('changeCurrent').value) || 0);
+            data.changeTarget = parseFloat(document.getElementById('changeTarget').value) || 0;
+            
+            const backlogVal = document.getElementById('backlogCurrent').value;
+            data.backlogCurrent = document.getElementById('backlogNA').checked ? 'N/A' : (backlogVal === 'N/A' ? 'N/A' : (parseFloat(backlogVal) || 0));
+            data.backlogTarget = parseFloat(document.getElementById('backlogTarget').value) || 0;
+            
+            // Auto-calculate changes from previous period
+            calculateChanges(data);
+            
+            // Update historical data with current data
+            historicalData[currentMonth] = data;
+            
+            saveData();
+            render();
+        }
+        
+        function calculateChanges(data) {
+            // Find the previous period chronologically
+            const months = getAvailableMonths();
+            const currentIndex = months.indexOf(currentMonth);
+            
+            if (currentIndex > 0) {
+                const previousPeriod = months[currentIndex - 1];
+                const previousData = historicalData[previousPeriod];
+                
+                if (previousData) {
+                    // Calculate roadmap change
+                    if (data.roadmapCurrent !== 'N/A' && previousData.roadmapCurrent !== 'N/A') {
+                        data.roadmapChange = Math.round(data.roadmapCurrent - previousData.roadmapCurrent);
+                    } else {
+                        data.roadmapChange = 0;
+                    }
+                    
+                    // Calculate change requests change
+                    if (data.changeCurrent !== 'N/A' && previousData.changeCurrent !== 'N/A') {
+                        data.changeChange = Math.round(data.changeCurrent - previousData.changeCurrent);
+                    } else {
+                        data.changeChange = 0;
+                    }
+                    
+                    // Calculate backlog change
+                    if (data.backlogCurrent !== 'N/A' && previousData.backlogCurrent !== 'N/A') {
+                        data.backlogChange = Math.round(data.backlogCurrent - previousData.backlogCurrent);
+                    } else {
+                        data.backlogChange = 0;
+                    }
+                }
+            } else {
+                // First period, no changes
+                data.roadmapChange = 0;
+                data.changeChange = 0;
+                data.backlogChange = 0;
+            }
+        }
+
+        function showAddPeriodModal() {
+            // Populate dropdown with existing periods
+            const months = getAvailableMonths();
+            const select = document.getElementById('copyFromPeriod');
+            select.innerHTML = `
+                <option value="_defaults">Start with default values</option>
+                <option value="_current">Copy from current period (${currentMonth})</option>
+            `;
+            months.forEach(m => {
+                select.innerHTML += `<option value="${m}">Copy from ${m}</option>`;
+            });
+            
+            // Suggest next period name
+            const lastMonth = months[months.length - 1];
+            document.getElementById('newPeriodName').value = '';
+            document.getElementById('newPeriodName').placeholder = `e.g., ${getNextPeriodSuggestion(lastMonth)}`;
+            
+            document.getElementById('addPeriodModal').classList.add('show');
+        }
+
+        function closeAddPeriodModal() {
+            document.getElementById('addPeriodModal').classList.remove('show');
+        }
+
+        function confirmAddPeriod() {
+            const newPeriodName = document.getElementById('newPeriodName').value.trim();
+            const copyFrom = document.getElementById('copyFromPeriod').value;
+            
+            if (!newPeriodName) {
+                alert('Please enter a period name');
+                return;
+            }
+            
+            if (historicalData[newPeriodName]) {
+                alert('This period already exists. Please choose a different name.');
+                return;
+            }
+            
+            // Create new period
+            let newPeriodData;
+            if (copyFrom === '_defaults') {
+                newPeriodData = JSON.parse(JSON.stringify(defaultData));
+            } else if (copyFrom === '_current') {
+                newPeriodData = JSON.parse(JSON.stringify(getCurrentData()));
+            } else {
+                newPeriodData = JSON.parse(JSON.stringify(historicalData[copyFrom]));
+            }
+            
+            // Update period name
+            newPeriodData.period = newPeriodName;
+            
+            // Reset changes to 0 for new period
+            newPeriodData.roadmapChange = 0;
+            newPeriodData.changeChange = 0;
+            newPeriodData.backlogChange = 0;
+            
+            // Add to historical data
+            historicalData[newPeriodName] = newPeriodData;
+            currentMonth = newPeriodName;
+            
+            saveData();
+            closeAddPeriodModal();
+            
+            // Open edit panel automatically
+            document.getElementById('editPanel').classList.add('show');
+            document.getElementById('editBtn').textContent = '✓ Done Editing';
+            document.getElementById('editBtn').className = 'btn btn-done';
+            
+            render();
+        }
+        
+        function getNextPeriodSuggestion(lastPeriod) {
+            // Simple suggestion - you can enhance this
+            return 'Next Period, 2026';
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
