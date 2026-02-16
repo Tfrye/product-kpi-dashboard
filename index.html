@@ -686,7 +686,7 @@
             const data = getCurrentData();
             const grid = document.getElementById('kpiGrid');
             grid.innerHTML = `
-                ${renderKPI('Roadmap Health', 'roadmap', 'Quarterly metric: Cumulative within the quarter; resets each quarter', 
+                ${renderKPI('Roadmap Health', 'roadmap', 'Quarterly metric: target - builds up throughout quarter', 
                     data.roadmapCurrent === 'N/A' ? '--' : data.roadmapCurrent + '%', 
                     data.roadmapTarget + '%', 'TARGET', data.roadmapChange, data.roadmapColor, data.roadmapCurrent === 'N/A')}
                 ${renderKPI('Approved Change Requests', 'changes', 'Minor & Major impact classifications (3 Minors = 1 Major)', 
