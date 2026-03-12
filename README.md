@@ -2,7 +2,7 @@
 
 A professional, interactive dashboard for tracking Product Department KPIs and initiatives. Built for monthly updates and executive presentations.
 
-**Live Dashboard:** https://tfrye.github.io/product-kpi-dashboard/
+**Live Dashboard:** https://teefrye.github.io/product-kpi-dashboard/
 
 ---
 
